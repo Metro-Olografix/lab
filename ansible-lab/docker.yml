@@ -40,25 +40,6 @@
         groups: docker
         append: yes
 
-
-    - name: nginx docker
-      community.docker.docker_image:
-        name: nginx
-        source: pull
-        pull:
-          platform: amd64
-
-    - name: Avviare il container Nginx
-      community.docker.docker_container:
-        name: nginx_container
-        image: nginx
-        state: started
-        restart_policy: always
-        published_ports:
-          - "80:80"
-        volumes:
-          - "/home/{{ ansible_user }}/nginx/html:/usr/share/nginx/html"
-
     - name: certbot
       apt:
         name:
@@ -78,4 +59,38 @@
 
     - name: Mostrare l'output di Certbot
       debug:
-        msg: "{{ certbot_output.stdout }}"
+          msg: "{{ certbot_output.stdout }}"
+
+    - name: certbot crontab
+      ansible.builtin.cron:
+        name: "certbot crontab"
+        minute: "0"
+        hour: "0"
+        job: "sudo certbot renew -q"
+
+    - name: copying nginx config 443
+      ansible.builtin.copy:
+        src: lab.olografix.org.conf
+        dest: /home/{{ ansible_user }}/nginx/lab.olografix.org.conf
+
+    - name: nginx docker
+      community.docker.docker_image:
+        name: nginx
+        source: pull
+        pull:
+          platform: amd64
+
+    - name: Avviare il container Nginx
+      community.docker.docker_container:
+        name: nginx_container
+        image: nginx
+        state: started
+        restart_policy: always
+        published_ports:
+          - "80:80"
+          - "443:443"
+        volumes:
+          - "/home/{{ ansible_user }}/nginx/html:/usr/share/nginx/html"
+          - "/home/{{ ansible_user }}/nginx/lab.olografix.org.conf:/etc/nginx/conf.d/lab.olografix.org.conf"
+          - "/etc/letsencrypt/live/lab.olografix.org/fullchain.pem:/etc/letsencrypt/live/lab.olografix.org/fullchain.pem"
+          - "/etc/letsencrypt/live/lab.olografix.org/privkey.pem:/etc/letsencrypt/live/lab.olografix.org/privkey.pem"
