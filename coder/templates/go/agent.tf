@@ -1,12 +1,18 @@
+data "local_file" "helloworld" {
+  filename = "${path.module}/example/helloworld.go"
+}
+
 resource "coder_agent" "main" {
   arch                   = data.coder_provisioner.me.arch
   os                     = "linux"
   startup_script         = <<-EOT
     set -e
 
-    # install and start code-server
-    curl -fsSL https://code-server.dev/install.sh | sh -s -- --method=standalone --prefix=/tmp/code-server
-    /tmp/code-server/bin/code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
+     cat > /home/${local.username}/helloworld.go << 'EOF'
+${data.local_file.helloworld.content}
+EOF
+
+    echo "File helloworld.go creato in /home/${local.username}/"
   EOT
 
   env = {
