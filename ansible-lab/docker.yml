@@ -1,0 +1,80 @@
+- name: Installing Docker Engine
+  hosts: lab
+  become: true
+
+  tasks:
+    - name: Install required system packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - virtualenv
+        state: latest
+        update_cache: true
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu noble stable
+        state: present
+
+    - name: Update apt and install Docker packages
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose
+        state: latest
+        update_cache: true
+
+    - name: Add user to the Docker group
+      user:
+        name: olografix
+        groups: docker
+        append: yes
+
+
+    - name: nginx docker
+      community.docker.docker_image:
+        name: nginx
+        source: pull
+        pull:
+          platform: amd64
+
+    - name: Avviare il container Nginx
+      community.docker.docker_container:
+        name: nginx_container
+        image: nginx
+        state: started
+        restart_policy: always
+        published_ports:
+          - "80:80"
+        volumes:
+          - "/home/{{ ansible_user }}/nginx/html:/usr/share/nginx/html"
+
+    - name: certbot
+      apt:
+        name:
+          - certbot
+          - python3-certbot-dns-cloudflare
+        state: present
+        update_cache: yes
+
+    - name: ssl certificate
+      command:
+        cmd: >
+          certbot certonly --dns-cloudflare
+          --dns-cloudflare-credentials ~/.secrets/certbot/cloudflare.ini
+          -d lab.olografix.org -d *.lab.olografix.org
+      register: certbot_output
+
+    - name: Mostrare l'output di Certbot
+      debug:
+        msg: "{{ certbot_output.stdout }}"
