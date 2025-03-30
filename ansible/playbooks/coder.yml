@@ -28,5 +28,10 @@
           CODER_ACCESS_URL: "https://lab.olografix.org"
           CODER_WILDCARD_ACCESS_URL: "*.lab.olografix.org"
           CODER_HTTP_ADDRESS: "0.0.0.0:3000"
+          CODER_OAUTH2_GITHUB_ALLOW_SIGNUPS: "true"
+          CODER_OAUTH2_GITHUB_ALLOWED_ORGS: "Metro-Olografix"
+          CODER_OAUTH2_GITHUB_DEFAULT_PROVIDER_ENABLE: "false"
+          CODER_OAUTH2_GITHUB_CLIENT_ID: "Ov23li31JtjdKp2ah8XI"
+          CODER_OAUTH2_GITHUB_CLIENT_SECRET: "{{ olografix_github_app_secret }}"
         groups:
           - 988
