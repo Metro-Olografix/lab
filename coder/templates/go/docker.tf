@@ -1,17 +1,11 @@
-resource "coder_app" "code-server" {
-  agent_id     = coder_agent.main.id
-  slug         = "code-server"
-  display_name = "code-server"
-  url          = "http://localhost:13337/?folder=/home/${local.username}"
-  icon         = "/icon/code.svg"
-  subdomain    = false
-  share        = "owner"
+module "code-server" {
+  count  = data.coder_workspace.me.start_count
+  source = "registry.coder.com/modules/code-server/coder"
 
-  healthcheck {
-    url       = "http://localhost:13337/healthz"
-    interval  = 5
-    threshold = 6
-  }
+  version = ">= 1.0.0"
+
+  agent_id = coder_agent.main.id
+  order    = 1
 }
 
 resource "docker_volume" "home_volume" {
