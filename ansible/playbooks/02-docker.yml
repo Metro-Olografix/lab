@@ -1,7 +1,7 @@
-  hosts: "*"
+- hosts: "*"
   become: true
   vars_files:
-    - ..inventory/psw.yml
+    - ../inventory/psw.yml
 
   tasks:
 
@@ -41,3 +41,7 @@
         name: olografix
         groups: docker
         append: yes
+    
+    - name: Create an internal network
+      docker_network:
+        name: internal

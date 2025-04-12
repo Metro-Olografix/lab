@@ -4,7 +4,6 @@
     - ../inventory/psw.yml
 
   tasks:
-
     - name: mkdir coder dir
       ansible.builtin.file:
         path: /home/olografix/coder/data/.config
@@ -21,8 +20,8 @@
         volumes:
           - "/home/olografix/coder/data:/home/coder/.config"
           - "/var/run/docker.sock:/var/run/docker.sock"
-        ports:
-          - "3000:3000"
+        networks:
+          - name: internal
         env:
           CODER_TELEMETRY_ENABLE: "false"
           CODER_ACCESS_URL: "https://lab.olografix.org"
