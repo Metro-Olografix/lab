@@ -4,14 +4,13 @@
     - ../inventory/psw.yml
 
   tasks:
-
     - name: certbot
-        apt:
-          name:
-            - certbot
-            - python3-certbot-dns-cloudflare
-          state: present
-          update_cache: yes
+      apt:
+        name:
+          - certbot
+          - python3-certbot-dns-cloudflare
+        state: present
+        update_cache: yes
 
     - name: ssl certificate
       command:
@@ -38,7 +37,7 @@
 
     - name: copying nginx config 443
       ansible.builtin.copy:
-        src: lab.olografix.org.conf
+        src: ../lab.olografix.org.conf
         dest: /home/{{ ansible_user }}/nginx/lab.olografix.org.conf
 
     - name: nginx docker
@@ -54,6 +53,8 @@
         image: nginx
         state: started
         restart_policy: always
+        networks:
+          - name: internal
         published_ports:
           - "80:80"
           - "443:443"

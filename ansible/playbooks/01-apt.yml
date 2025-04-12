@@ -1,10 +1,9 @@
 - hosts: "*"
-  become: yes
+  become: true
   vars_files:
     - ../inventory/psw.yml
 
   tasks:
-
     - name: apt
       apt:
         upgrade: yes
